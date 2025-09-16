@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, TrendingUp, AlertTriangle, Coffee, Zap } from 'lucide-react';
+import { Clock, TrendingUp, AlertTriangle, Coffee, Zap, Volume2, VolumeX } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface MarketTimeInfo {
   currentTime: Date;
@@ -14,6 +15,8 @@ interface MarketTimeInfo {
 
 const StockMarketClock = () => {
   const [timeInfo, setTimeInfo] = useState<MarketTimeInfo | null>(null);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
+  const lastMessageRef = useRef<string>('');
 
   const getMarketTimeInfo = (): MarketTimeInfo => {
     const now = new Date();
@@ -109,16 +112,58 @@ const StockMarketClock = () => {
     };
   };
 
+  const speakMessage = async (message: string) => {
+    if (!isVoiceEnabled) return;
+    
+    try {
+      // Use ElevenLabs API to generate speech
+      const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/9BWtsMINqrJLrRacOk9x', {
+        method: 'POST',
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'application/json',
+          'xi-api-key': process.env.ELEVENLABS_API_KEY || ''
+        },
+        body: JSON.stringify({
+          text: message,
+          model_id: 'eleven_turbo_v2',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75,
+            style: 0.0,
+            use_speaker_boost: true
+          }
+        })
+      });
+
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        audio.play();
+      }
+    } catch (error) {
+      console.error('Error generating speech:', error);
+    }
+  };
+
   useEffect(() => {
     const updateTime = () => {
-      setTimeInfo(getMarketTimeInfo());
+      const newTimeInfo = getMarketTimeInfo();
+      setTimeInfo(newTimeInfo);
+      
+      // Speak message when it changes
+      if (newTimeInfo.currentMessage !== lastMessageRef.current) {
+        lastMessageRef.current = newTimeInfo.currentMessage;
+        speakMessage(newTimeInfo.currentMessage);
+      }
     };
 
     updateTime();
     const interval = setInterval(updateTime, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isVoiceEnabled]);
 
   const getMessageIcon = (type: MarketTimeInfo['messageType']) => {
     switch (type) {
@@ -163,9 +208,19 @@ const StockMarketClock = () => {
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-foreground tracking-wide">
-              MARKET TIMELINE
-            </h1>
+            <div className="flex items-center justify-center space-x-4">
+              <h1 className="text-4xl font-bold text-foreground tracking-wide">
+                MARKET TIMELINE
+              </h1>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}
+                className="ml-4"
+              >
+                {isVoiceEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              </Button>
+            </div>
             <div className="flex items-center justify-center space-x-4">
               <div className="text-2xl font-mono text-gold">
                 {timeInfo.currentTime.toLocaleTimeString('en-US', {

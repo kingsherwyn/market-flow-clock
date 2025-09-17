@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Clock - Trading Timeline</title>
+    <meta name="description" content="Real-time linear stock market clock with contextual trading messages for NYSE hours">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="clock-card">
+            <!-- Header -->
+            <div class="header">
+                <div class="title-section">
+                    <h1 class="title">MARKET TIMELINE</h1>
+                    <button id="voiceToggle" class="voice-button">
+                        <svg id="volumeIcon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="time-display">
+                    <div class="current-time" id="currentTime">--:--:-- --</div>
+                    <div class="timezone">Eastern Standard Time</div>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline-container">
+                <div class="timeline-track">
+                    <div class="timeline-progress" id="timelineProgress"></div>
+                    <div class="timeline-marker" id="timelineMarker"></div>
+                </div>
+                <div class="timeline-labels">
+                    <span class="timeline-label">9:15 AM</span>
+                    <span class="timeline-label">10:00 AM</span>
+                    <span class="timeline-label">12:00 PM</span>
+                    <span class="timeline-label">1:00 PM</span>
+                    <span class="timeline-label">3:00 PM</span>
+                    <span class="timeline-label">4:00 PM</span>
+                </div>
+            </div>
+
+            <!-- Message Section -->
+            <div class="message-section">
+                <div class="message-icon" id="messageIcon">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12,6 12,12 16,14"></polyline>
+                    </svg>
+                </div>
+                <div class="message-content">
+                    <div class="message-title" id="messageTitle">Market Status</div>
+                    <div class="message-text" id="messageText">Loading market data...</div>
+                </div>
+            </div>
+
+            <!-- Market Status Badge -->
+            <div class="status-section">
+                <div class="status-badge" id="statusBadge">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span id="statusText">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
